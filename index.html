@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanity test</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@sanity/client"></script>
+    <script>
+      // Step 1: Import the Sanity client
+      import {sanityClient} from 'vanillajs\node_modules\@sanity\client\sanityClient.d.ts' 
+  
+      // Step 2: Configure the client
+      const client = sanityClient({
+        projectId: '97sywsv0',
+        dataset: 'production',
+        apiVersion: '2022-11-15',
+        useCdn: true // optional, but recommended
+      })
+  
+      // Step 3: Fetch data from Sanity
+      client
+        .fetch(`*[_type == "product"]`)
+        .then(products => {
+          // Step 4: Display the data in your application
+          const app = document.querySelector('#app')
+          products.forEach(product => {
+            const productEl = document.createElement('div')
+            productEl.innerHTML = `<h2>${product.title}</h2><p>${product.description}</p>`
+            app.appendChild(productEl)
+          })
+        })
+        .catch(err => {
+          console.error('Oh no, the request failed: ', err)
+        })
+    </script>
+  </body>
+</html>
