@@ -7,35 +7,56 @@
     <title>Sanity test</title>
 </head>
 <body>
-    <div id="app"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@sanity/client"></script>
+  <main>
+    <h2>Pets</h2>
+    <ul>
+      <li>Loading pets…</li>
+    </ul>
+
+    <div>
+      <pre>
+¯\_(ツ)_/¯
+Your data will show up here when you've configured everything correctly
+      </pre>
+    </div>
+  </main>
     <script>
-      // Step 1: Import the Sanity client
-      import {sanityClient} from 'vanillajs\node_modules\@sanity\client\sanityClient.d.ts' 
-  
-      // Step 2: Configure the client
-      const client = sanityClient({
-        projectId: '97sywsv0',
-        dataset: 'production',
-        apiVersion: '2022-11-15',
-        useCdn: true // optional, but recommended
-      })
-  
-      // Step 3: Fetch data from Sanity
-      client
-        .fetch(`*[_type == "product"]`)
-        .then(products => {
-          // Step 4: Display the data in your application
-          const app = document.querySelector('#app')
-          products.forEach(product => {
-            const productEl = document.createElement('div')
-            productEl.innerHTML = `<h2>${product.title}</h2><p>${product.description}</p>`
-            app.appendChild(productEl)
-          })
+      // Select the DOM-element, so that you can replace it with content
+      let PROJECT_ID = "97sywsv0";
+      let DATASET = "production";
+      let QUERY = encodeURIComponent('*[_type == "pet"]');
+
+      // Compose the URL for your project's endpoint and add the query
+      let URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${QUERY}`;
+
+      // fetch the content
+      fetch(URL)
+        .then((res) => res.json())
+        .then(({ result }) => {
+          // get the list element, and the first item
+          let list = document.querySelector("ul");
+          let firstListItem = document.querySelector("ul li");
+
+          if (result.length > 0) {
+            // remove the placeholder content
+            list.removeChild(firstListItem);
+
+            result.forEach((pet) => {
+              // create a list element for each pet
+              let listItem = document.createElement("li");
+
+              // add the pet name as the text content
+              listItem.textContent = pet?.name;
+
+              // add the item to the list
+              list.appendChild(listItem);
+            });
+            let pre = document.querySelector("pre");
+            // add the raw data to the preformatted element
+            pre.textContent = JSON.stringify(result, null, 2);
+          }
         })
-        .catch(err => {
-          console.error('Oh no, the request failed: ', err)
-        })
+        .catch((err) => console.error(err));
     </script>
   </body>
 </html>
